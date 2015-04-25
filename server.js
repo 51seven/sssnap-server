@@ -26,6 +26,12 @@ var secrets   = require('./config/secrets');
 global.Log    = require('./config/logger');
 
 
+// CHECK ENVIRONMENT
+// =========================================================
+
+require('./check');
+
+
 // DATABASE CONNECTION
 // =========================================================
 
@@ -74,7 +80,7 @@ if (env !== 'test')                               // An automatic logger is very
   app.use(morgan('dev'));                         // when running tests.
 
 app.use(helmet.xssFilter());                      // Prevents cross-site scripting attacks.
-app.use(helmet.frameguard('SAMEORIGIN'));        // Prevents clickjacking by emedding the page
+app.use(helmet.frameguard('SAMEORIGIN'));         // Prevents clickjacking by embedding the page
                                                   // in a <frame> or <iframe>.
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -102,8 +108,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 var rootPages = require('./routes/rootpages');
 var dashboard = require('./routes/dashboard');
 
-app.use('/dashboard', dashboard);
-app.use('/', rootPages);
+// app.use('/dashboard', dashboard);
+// app.use('/', rootPages);
 
 
 // ERROR HANDLING

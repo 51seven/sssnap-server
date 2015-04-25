@@ -17,6 +17,8 @@ var errorhandler      = require('errorhandler');
 var mongoose          = require('mongoose');
 var MongoStore        = require('connect-mongo')(session);
 var cons              = require('consolidate');
+var helmet            = require('helmet');
+var passport          = require('passport');
 
 var env       = process.env.NODE_ENV || "development";
 var secrets   = require('./config/secrets');
@@ -27,7 +29,7 @@ global.Log    = require('./config/logger');
 // DATABASE CONNECTION
 // =========================================================
 
-var connection = mongoose.connect(secrets[env].mongodb);
+var connection = mongoose.createConnection(secrets[env].mongodb);
 
 var connected = false;
 mongoose.connection
@@ -72,7 +74,7 @@ if (env !== 'test')                               // An automatic logger is very
   app.use(morgan('dev'));                         // when running tests.
 
 app.use(helmet.xssFilter());                      // Prevents cross-site scripting attacks.
-app.use(helment.frameguard('SAMEORIGIN'));        // Prevents clickjacking by emedding the page
+app.use(helmet.frameguard('SAMEORIGIN'));        // Prevents clickjacking by emedding the page
                                                   // in a <frame> or <iframe>.
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -86,6 +88,9 @@ app.use(session({                                 // the session cookie will be 
   store: new MongoStore({ mongooseConnection: connection }),
   cookie: { secure: true }
 }));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(express.static(path.join(__dirname, 'public')));
 

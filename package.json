@@ -1,7 +1,7 @@
 {
   "name": "sssnap-server",
-  "version": "0.0.0",
-  "description": "",
+  "version": "0.0.1",
+  "description": "The sssnap webserver",
   "scripts": {
     "start": "sh launch.sh",
     "test": "echo \"Error: no test specified\" && exit 1"

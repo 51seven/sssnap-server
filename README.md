@@ -62,7 +62,7 @@ Also, while the server starts, a script will check the availability of the envir
 **I get an error "Cannot start Server due to missing * credentials."**  
 *Answer: You can't simply run server.js. Use npm start or the provided bash file, it really doesn't matter.*
 
-**Everytime I start the server a directory named incoming is created in the project.**
+**Everytime I start the server a directory named incoming is created in the project.**  
 *Answer: That's fine. The uploaded and not-yet processed images will be stored there temporarily. This way your temp-filesystem won't be spammed and it's better for development/debugging purposes.*
 
 **I'm using Windows and can't execute the bash script!**  

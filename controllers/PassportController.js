@@ -45,8 +45,8 @@ passport.use(new GoogleStrategy(
         // If the user is logged in and has already connected google to
         // his account, reject it!
         if (existingUser) {
-          // TODO: flash message
-          next(null, existingUser);
+          req.flash('warn', 'You already connected a Google Account to your account.');
+          return next(null, existingUser);
         }
         else {
 
@@ -54,9 +54,9 @@ passport.use(new GoogleStrategy(
           // so add the users ID from Google to his account.
           User.read(req.user.id, function (err, user) {
             user.oauth.google = profile.id;
-            user.save(function (err) {
-              // TODO: flash message
-              next(err, user);
+            user.save(function (err, savedUser) {
+              req.flash('info', 'Successfully linked your Account with Google.');
+              return next(err, savedUser);
             });
           });
         }
@@ -67,8 +67,7 @@ passport.use(new GoogleStrategy(
     // login or to register.
     else {
       User.findOne({ 'oauth.google': profile.id }, function (err, existingUser) {
-        Log.i('We made the DB Request');
-        // If the user is found in the database, he is logged in!
+        // If the user is found in the database, he will be logged in!
         if (existingUser) {
           return next(null, existingUser);
         }
@@ -78,8 +77,11 @@ passport.use(new GoogleStrategy(
         User.findOne({ email: profile.emails[0].value }, function (err, existingEmailUser) {
 
           if (existingEmailUser) {
-            // TODO: flash message
-            next(err);
+            existingEmailUser.oauth.google = profile.id;
+            existingEmailUser.save(function (err, savedUser) {
+              req.flash('info', 'Successfully linked your Account with Google.');
+              return next(err, savedUser);
+            });
           }
 
           // At this point we can register a new user with the by Google authorized
@@ -92,14 +94,16 @@ passport.use(new GoogleStrategy(
             newUser.oauth.google = profile.id;
 
             User.create(newUser).then(function (registeredUser) {
+              req.flash('success', 'Registered, yay!');
               return next(null, registeredUser);
             }).catch(function (err) {
+              req.flash('error', 'Error while registering.');
               return next(err);
             });
           }
-        })
-      })
-    }
+        });
+      });
+    } // endif (req.user)
 
   }
 ));

@@ -14,6 +14,7 @@ var multer            = require('multer');
 var methodOverride    = require('method-override');
 var cookieParser      = require('cookie-parser');
 var session           = require('express-session');
+var flash             = require('express-flash');
 var morgan            = require('morgan');
 var expressValidator  = require('express-validator');
 var errorhandler      = require('errorhandler');
@@ -100,6 +101,11 @@ app.use(session({                                 // the session cookie will be 
   }),
   cookie: { secure: true }
 }));
+app.use(flash());
+app.use(function (req, res, next) {               // Adding user to res.locals
+  res.locals.user = req.user;                     // to access user informations in the template.
+  next();
+});
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -116,7 +122,7 @@ var authorize = require('./routes/authorize');
 
 app.use('/auth', authorize);
 // app.use('/dashboard', dashboard);
-// app.use('/', rootPages);
+app.use('/', rootPages);
 
 
 // ERROR HANDLING

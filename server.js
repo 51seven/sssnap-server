@@ -5,6 +5,9 @@ var https = require('https');
 var fs    = require('fs');
 var path  = require('path');
 
+// Establish our custom winston logger everywhere
+global.Log = require('./config/logger');
+
 var express           = require('express');
 var bodyParser        = require('body-parser');
 var multer            = require('multer');
@@ -20,10 +23,8 @@ var cons              = require('consolidate');
 var helmet            = require('helmet');
 var passport          = require('passport');
 
-var env       = process.env.NODE_ENV || "development";
-var secrets   = require('./config/secrets');
-
-global.Log    = require('./config/logger');
+var env     = process.env.NODE_ENV || "development";
+var secrets = require('./config/secrets');
 
 
 // CHECK ENVIRONMENT
@@ -35,7 +36,7 @@ require('./check');
 // DATABASE CONNECTION
 // =========================================================
 
-var connection = mongoose.createConnection(secrets[env].mongodb);
+mongoose.connect(secrets[env].mongodb);
 
 var connected = false;
 mongoose.connection
@@ -73,11 +74,11 @@ app.disable('x-powered-by');                      // No x-powered-by Header in r
 app.engine('html', cons.hogan);                   // =
 app.set('view engine', 'html');                   // Hogan.js Template Engine
 app.set('views', path.join(__dirname, 'views'));  // =
-app.set('port', process.env.PORT || 4000);        //
+app.set('port', process.env.PORT || 4000);
 app.set('trust proxy', 1);                        // Trust first proxy (nginx)
 
 if (env !== 'test')                               // An automatic logger is very distracting
-  app.use(morgan('dev'));                         // when running tests.
+  app.use(morgan('dev'));                         // while running tests.
 
 app.use(helmet.xssFilter());                      // Prevents cross-site scripting attacks.
 app.use(helmet.frameguard('SAMEORIGIN'));         // Prevents clickjacking by embedding the page
@@ -91,7 +92,12 @@ app.use(cookieParser());                          // "Normal" cookies won't be s
 app.use(session({                                 // the session cookie will be signed.
   name: 'sssnap.sid',
   secret: process.env.SESSION_SECRET || secrets.sessionSecret,
-  store: new MongoStore({ mongooseConnection: connection }),
+  saveUninitialized: false,                       // Completely new and not modified sessions will not be saved.
+  resave: false,                                  // Don't save a session if it's not modified. ...
+  store: new MongoStore({
+    mongooseConnection: mongoose.connection,
+    touchAfter: 24 * 3600                         // ... However, save the session at least once every 24 hours.
+  }),
   cookie: { secure: true }
 }));
 
@@ -101,13 +107,14 @@ app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-
 // ROUTES
 // =========================================================
 
 var rootPages = require('./routes/rootpages');
 var dashboard = require('./routes/dashboard');
+var authorize = require('./routes/authorize');
 
+app.use('/auth', authorize);
 // app.use('/dashboard', dashboard);
 // app.use('/', rootPages);
 
@@ -129,5 +136,5 @@ var options = {
 
 var server = https.createServer(options, app);
 server.listen(app.get('port'), function () {
-  Log.i('Server running on port ' + app.get('port'));
+  Log.i('Server running on port', app.get('port'));
 });

@@ -2,8 +2,8 @@
   "name": "sssnap-server",
   "version": "0.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
+    "start": "sh launch.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -33,6 +33,8 @@
     "mongoose": "^4.0.2",
     "morgan": "^1.5.2",
     "multer": "^0.1.8",
+    "passport": "^0.2.1",
+    "passport-google-oauth": "^0.2.0",
     "sssnap-models": "git://github.com/51seven/sssnap-models",
     "winston": "^1.0.0"
   }

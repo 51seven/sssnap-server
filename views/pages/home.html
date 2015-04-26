@@ -1,0 +1,10 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+{% if user %}
+
+Hi {{ user.name.first }}
+
+{% endif %}
+{% endblock %}

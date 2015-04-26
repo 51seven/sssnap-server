@@ -24,8 +24,9 @@ var cons              = require('consolidate');
 var helmet            = require('helmet');
 var passport          = require('passport');
 
-var env     = process.env.NODE_ENV || "development";
-var secrets = require('./config/secrets');
+var env      = process.env.NODE_ENV || "development";
+var secrets  = require('./config/secrets');
+var swigConf = require('./config/swig');
 
 
 // CHECK ENVIRONMENT
@@ -72,9 +73,10 @@ function gracefullyExit() {
 var app = express();
 
 app.disable('x-powered-by');                      // No x-powered-by Header in response
-app.engine('html', cons.hogan);                   // =
-app.set('view engine', 'html');                   // Hogan.js Template Engine
-app.set('views', path.join(__dirname, 'views'));  // =
+app.engine('html', cons.swig);                    // Swig Template Engine ...
+app.set('view engine', 'html');                   //
+app.set('views', path.join(__dirname, 'views'));  //
+app.use(swigConf(cons));                          // ... with custom configurations.
 app.set('port', process.env.PORT || 4000);
 app.set('trust proxy', 1);                        // Trust first proxy (nginx)
 
@@ -102,13 +104,12 @@ app.use(session({                                 // the session cookie will be 
   cookie: { secure: true }
 }));
 app.use(flash());
-app.use(function (req, res, next) {               // Adding user to res.locals
-  res.locals.user = req.user;                     // to access user informations in the template.
-  next();
-});
-
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(function (req, res, next) {
+  res.locals.user = req.user;                     // Expose user in Template Engine
+  next();
+})
 
 app.use(express.static(path.join(__dirname, 'public')));
 

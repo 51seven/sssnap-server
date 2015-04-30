@@ -120,8 +120,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 var rootPages = require('./routes/rootpages');
 var dashboard = require('./routes/dashboard');
 var authorize = require('./routes/authorize');
+var uploads   = require('./routes/uploads');
+var users     = require('./routes/users');
 
 app.use('/auth', authorize);
+// app.use('/users', users);
+// app.use('/uploads', uploads);
 // app.use('/dashboard', dashboard);
 app.use('/', rootPages);
 

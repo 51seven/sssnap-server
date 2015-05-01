@@ -129,7 +129,7 @@ gulp.task('img', function() {
 gulp.task('watch', function() {
 
   browserSync({
-    proxy: "localhost:8888/logicmedia/"
+    proxy: "localhost:4000"
     // , notify: false // if the browser notifications are annoying
   });
 

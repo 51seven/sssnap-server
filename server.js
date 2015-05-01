@@ -22,6 +22,7 @@ var errorhandler      = require('errorhandler');
 var mongoose          = require('mongoose');
 var MongoStore        = require('connect-mongo')(session);
 var cons              = require('consolidate');
+var ejsHelper         = require('ejs-helper');
 var helmet            = require('helmet');
 var passport          = require('passport');
 
@@ -107,6 +108,7 @@ app.use(session({                                 // the session cookie will be 
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(ejsHelper());
 app.use(function (req, res, next) {
   res.locals.user = req.user;                     // Expose user in Template Engine
   next();

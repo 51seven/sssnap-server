@@ -1,15 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Document</title>
-</head>
-<body>
-  <% include ../includes/flash %>
-  <% if (user) { %>
-    Hi <%= user.name.full  %>
-  <% } else { %>
-    You're not logged in
-  <% } %>
-</body>
-</html>
+<%
+setTitle('Home');
+-%>
+<% include ../includes/header -%>
+<% include ../includes/flash -%>
+<% if (user) { -%>
+  Hi <%= user.name.full  %>
+<% } else { -%>
+  You're not logged in
+<% } -%>

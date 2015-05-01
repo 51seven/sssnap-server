@@ -69,6 +69,8 @@ passport.use(new GoogleStrategy(
       User.findOne({ 'oauth.google': profile.id }, function (err, existingUser) {
         // If the user is found in the database, he will be logged in!
         if (existingUser) {
+          req.flash('info', 'Heya');
+          req.flash('success', 'Logged in!');
           return next(null, existingUser);
         }
 

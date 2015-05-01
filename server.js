@@ -15,6 +15,7 @@ var methodOverride    = require('method-override');
 var cookieParser      = require('cookie-parser');
 var session           = require('express-session');
 var flash             = require('express-flash');
+var compression       = require('compression');
 var morgan            = require('morgan');
 var expressValidator  = require('express-validator');
 var errorhandler      = require('errorhandler');
@@ -26,7 +27,6 @@ var passport          = require('passport');
 
 var env      = process.env.NODE_ENV || "development";
 var secrets  = require('./config/secrets');
-var swigConf = require('./config/swig');
 
 
 // CHECK ENVIRONMENT
@@ -73,16 +73,17 @@ function gracefullyExit() {
 var app = express();
 
 app.disable('x-powered-by');                      // No x-powered-by Header in response
-app.engine('html', cons.swig);                    // Swig Template Engine ...
-app.set('view engine', 'html');                   //
-app.set('views', path.join(__dirname, 'views'));  //
-app.use(swigConf(cons));                          // ... with custom configurations.
+app.engine('ejs', cons.ejs);
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
 app.set('port', process.env.PORT || 4000);
 app.set('trust proxy', 1);                        // Trust first proxy (nginx)
 
 if (env !== 'test')                               // An automatic logger is very distracting
   app.use(morgan('dev'));                         // while running tests.
 
+app.use(compression());
 app.use(helmet.xssFilter());                      // Prevents cross-site scripting attacks.
 app.use(helmet.frameguard('SAMEORIGIN'));         // Prevents clickjacking by embedding the page
                                                   // in a <frame> or <iframe>.

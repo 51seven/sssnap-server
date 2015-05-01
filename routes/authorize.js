@@ -22,7 +22,7 @@ router.get('/google/callback',
   ),
   // Redirect to users dashboard, if login was successful
   function (req, res) {
-    res.redirect('/dashboard');
+    res.redirect('/');
   }
 );
 
